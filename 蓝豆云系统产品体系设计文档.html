@@ -1,0 +1,1240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>蓝豆云 LANDOW 酒店房务管理系统 - 产品体系设计文档</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Microsoft YaHei", "PingFang SC", sans-serif; background: #f5f7fa; color: #333; line-height: 1.8; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+  header { background: linear-gradient(135deg, #1a5276 0%, #2980b9 100%); color: #fff; padding: 50px 40px; border-radius: 12px; margin-bottom: 30px; }
+  header h1 { font-size: 32px; margin-bottom: 10px; }
+  header .subtitle { font-size: 16px; opacity: 0.9; }
+  header .meta { margin-top: 20px; font-size: 14px; opacity: 0.8; }
+  nav { background: #fff; border-radius: 10px; padding: 20px 30px; margin-bottom: 30px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  nav h3 { color: #1a5276; margin-bottom: 12px; font-size: 16px; }
+  nav ol { padding-left: 20px; }
+  nav li { margin: 6px 0; }
+  nav a { color: #2980b9; text-decoration: none; }
+  nav a:hover { text-decoration: underline; }
+  section { background: #fff; border-radius: 10px; padding: 35px 40px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  h2 { color: #1a5276; font-size: 24px; border-left: 5px solid #2980b9; padding-left: 15px; margin-bottom: 20px; }
+  h3 { color: #2c3e50; font-size: 18px; margin: 25px 0 12px; padding-bottom: 8px; border-bottom: 1px dashed #ddd; }
+  h4 { color: #34495e; font-size: 15px; margin: 15px 0 8px; }
+  p { margin: 10px 0; text-align: justify; }
+  ul, ol { padding-left: 25px; margin: 10px 0; }
+  li { margin: 6px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 14px; }
+  th { background: #1a5276; color: #fff; padding: 10px 12px; text-align: left; font-weight: 500; }
+  td { padding: 9px 12px; border-bottom: 1px solid #eee; }
+  tr:nth-child(even) { background: #f8f9fa; }
+  tr:hover { background: #eaf2f8; }
+  .tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 12px; margin: 2px; }
+  .tag-blue { background: #d6eaf8; color: #1a5276; }
+  .tag-green { background: #d5f5e3; color: #1e8449; }
+  .tag-orange { background: #fdebd0; color: #b9770e; }
+  .tag-red { background: #fadbd8; color: #922b21; }
+  .tag-purple { background: #e8daef; color: #6c3483; }
+  .arch-box { display: flex; flex-wrap: wrap; gap: 15px; margin: 20px 0; }
+  .arch-card { flex: 1; min-width: 280px; background: #f0f7ff; border: 1px solid #b8daff; border-radius: 8px; padding: 18px; }
+  .arch-card h4 { color: #1a5276; margin-top: 0; }
+  .flow-step { background: #f8f9fa; border-left: 3px solid #2980b9; padding: 12px 18px; margin: 10px 0; border-radius: 0 6px 6px 0; }
+  .flow-step strong { color: #1a5276; }
+  .highlight { background: #fff3cd; padding: 2px 6px; border-radius: 3px; }
+  .note { background: #eaf2f8; border-radius: 6px; padding: 12px 18px; margin: 12px 0; font-size: 14px; color: #1a5276; }
+  .note::before { content: "💡 "; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  @media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } }
+  .module-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin: 10px 0; }
+  .module-card h4 { color: #2980b9; margin-top: 0; }
+  footer { text-align: center; padding: 30px; color: #888; font-size: 13px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>蓝豆云 LANDOW 酒店房务管理系统</h1>
+  <div class="subtitle">产品体系与功能模块完整设计文档 —— 基于系统界面全量图片逆向分析</div>
+  <div class="meta">分析范围：59张系统界面截图 ｜ 覆盖端：手机端APP / PC端客房管家 / PC端住客服务管家 ｜ 对接：绿云PMS / 携程小程序</div>
+</header>
+
+<nav>
+  <h3>目录</h3>
+  <ol>
+    <li><a href="#s1">系统概述与产品定位</a></li>
+    <li><a href="#s2">整体产品架构</a></li>
+    <li><a href="#s3">十大核心功能模块详解</a></li>
+    <li><a href="#s4">服务员/领班侧 — 手机端APP产品设计</a></li>
+    <li><a href="#s5">前台侧 — PC端住客服务管家产品设计</a></li>
+    <li><a href="#s6">客房经理侧 — PC端客房管家产品设计</a></li>
+    <li><a href="#s7">核心业务流程</a></li>
+    <li><a href="#s8">数据统计与报表体系</a></li>
+    <li><a href="#s9">系统配置与基础数据</a></li>
+    <li><a href="#s10">角色权限与端功能矩阵</a></li>
+  </ol>
+</nav>
+
+<!-- ==================== 1. 系统概述 ==================== -->
+<section id="s1">
+<h2>一、系统概述与产品定位</h2>
+
+<h3>1.1 系统基本信息</h3>
+<table>
+  <tr><th style="width:30%">项目</th><th>内容</th></tr>
+  <tr><td>系统名称</td><td><strong>蓝豆云 LANDOW</strong>（酒店房务与对客服务管理系统）</td></tr>
+  <tr><td>Web端地址</td><td>https://a.landow.cn/LandowOne/</td></tr>
+  <tr><td>产品形态</td><td>手机端APP（Android） + PC端Web管理后台（双工作台）</td></tr>
+  <tr><td>目标用户</td><td>酒店客房部服务员、领班/主管、客房经理、前厅部前台</td></tr>
+  <tr><td>PMS对接</td><td>绿云PMS（M5 V5 build 5.2.8.0 / hiHotel平台），实时房态同步</td></tr>
+  <tr><td>OTA对接</td><td>携程小程序（ebook.ctrip.com），客人自助下单送物/催服务，消息打通</td></tr>
+  <tr><td>部署方式</td><td>SaaS云平台，多租户（按酒店隔离）</td></tr>
+</table>
+
+<h3>1.2 产品定位</h3>
+<p>蓝豆云是面向中高端酒店的<strong>房务运营与对客服务一体化管理平台</strong>，核心解决三大问题：</p>
+<ul>
+  <li><strong>房务执行数字化</strong>：从PMS获取房态，自动生成清洁任务，手机端执行清洁/检查/报修，全程计时留痕</li>
+  <li><strong>对客服务响应化</strong>：前台/客人/OTA多渠道发起服务工单，自动派单给空闲人员，超时分级预警</li>
+  <li><strong>管理决策数据化</strong>：员工做工量、清洁质量、布草消耗、服务时效等多维度报表，支持计件结算</li>
+</ul>
+
+<h3>1.3 设计理念</h3>
+<div class="grid-2">
+  <div class="module-card">
+    <h4>执行端极简</h4>
+    <p>服务员APP以"任务列表→操作→完成"为主线，减少输入，多用勾选和默认值（如布草自动预估），适合戴手套/单手操作</p>
+  </div>
+  <div class="module-card">
+    <h4>管理端全局</h4>
+    <p>PC端以房态图为核心视觉，一屏掌握全酒店房态、人员负载、任务进度，支持拖拽分配和批量操作</p>
+  </div>
+  <div class="module-card">
+    <h4>前台端服务</h4>
+    <p>住客服务管家以"快速创建工单→跟踪→客人档案"为核心，强调响应速度和客人偏好积累</p>
+  </div>
+  <div class="module-card">
+    <h4>计件与质量并重</h4>
+    <p>每间房按房型配置分值（退房/住房/空房不同分值），员工做工量自动统计，支持超额计件；同时清洁检查通过率纳入统计</p>
+  </div>
+</div>
+</section>
+
+<!-- ==================== 2. 整体产品架构 ==================== -->
+<section id="s2">
+<h2>二、整体产品架构</h2>
+
+<h3>2.1 三端产品形态</h3>
+<div class="arch-box">
+  <div class="arch-card">
+    <h4>📱 手机端APP</h4>
+    <p><strong>使用者：</strong>客房服务员、领班/主管</p>
+    <p><strong>核心场景：</strong>客房清洁执行、工单接收处理、查房登记、布草更新、报修、借物归还</p>
+    <p><strong>首页功能入口：</strong>新建工单、我的工单、服务管理、客房管理</p>
+    <p><strong>特点：</strong>需设置每日值班地点（楼层），按值班范围接收任务</p>
+  </div>
+  <div class="arch-card">
+    <h4>💻 PC端 · 客房管家</h4>
+    <p><strong>使用者：</strong>客房经理、客房主管/领班</p>
+    <p><strong>核心场景：</strong>每日分配做房、房态图监控、员工排班、布草配置、报表导出、系统设置</p>
+    <p><strong>左侧菜单：</strong>每日分配、房态图、客人相关、员工班表、布草/酒水、设置</p>
+    <p><strong>特点：</strong>全局视角，拖拽分配，Excel报表导出</p>
+  </div>
+  <div class="arch-card">
+    <h4>💻 PC端 · 住客服务管家</h4>
+    <p><strong>使用者：</strong>前台接待、前厅主管</p>
+    <p><strong>核心场景：</strong>对客服务工单创建与跟踪、赶房管理、退房检查、投诉处理、客人档案、服务标准配置</p>
+    <p><strong>左侧菜单：</strong>查房、赶房、对客服务、行李寄存、住客反馈、服务排班、服务标准、报表、投诉预警、客人档案</p>
+    <p><strong>特点：</strong>服务响应为核心，客人信息联动，超时预警</p>
+  </div>
+</div>
+
+<h3>2.2 系统功能架构总览</h3>
+<table>
+  <tr><th style="width:18%">功能域</th><th style="width:35%">子模块</th><th>核心能力</th></tr>
+  <tr><td><span class="tag tag-blue">房务管理</span></td><td>房态图、每日分配、客房清洁、清洁检查、赶房管理、房间抽查、空房检查</td><td>房态同步、任务分配、清洁执行、质量检查、加急赶房</td></tr>
+  <tr><td><span class="tag tag-green">工单管理</span></td><td>服务工单、客人报修、内部报修、客房自查、打扫房间、客人换房、遗留查找、催服务、内务单</td><td>多渠道发起、自动派单、状态流转、超时预警、批量操作</td></tr>
+  <tr><td><span class="tag tag-orange">对客服务</span></td><td>物品送物、开门服务、夜床服务、行李寄存、住客反馈、投诉预警、客人档案</td><td>OTA打通、客人偏好、服务时效、投诉跟踪</td></tr>
+  <tr><td><span class="tag tag-purple">布草易耗品</span></td><td>布草配置、布草更新、消耗记录、布草酒水统计</td><td>按房型标准、自动预估、多维度统计</td></tr>
+  <tr><td><span class="tag tag-red">工程维修</span></td><td>维修工单、报修登记、验收、重新维修</td><td>清洁中关联报修、维修闭环</td></tr>
+  <tr><td><span class="tag tag-blue">查房遗留</span></td><td>退房检查、客房自查、遗留登记、借物归还</td><td>通过/异常判定、遗留分类、归还跟踪</td></tr>
+  <tr><td><span class="tag tag-green">人员排班</span></td><td>员工班表、服务排班、清洁检查排班、人员状态、值班地点</td><td>三班制、楼层负责、空闲/忙实时</td></tr>
+  <tr><td><span class="tag tag-orange">统计分析</span></td><td>做工统计、清洁人报表、进度报表、进度汇总、服务统计、日报/月报</td><td>计件结算、多维度导出、时效分析</td></tr>
+  <tr><td><span class="tag tag-purple">系统设置</span></td><td>房型管理、分值配置、服务标准、布草配置、特例分类</td><td>基础数据维护、超时规则</td></tr>
+  <tr><td><span class="tag tag-red">消息通知</span></td><td>服务提醒、群发通知、消息弹窗、短信通知、携程消息</td><td>多渠道触达、分级提醒</td></tr>
+</table>
+</section>
+
+<!-- ==================== 3. 十大核心功能模块 ==================== -->
+<section id="s3">
+<h2>三、十大核心功能模块详解</h2>
+
+<h3>3.1 房态管理模块</h3>
+<h4>3.1.1 房态图（PC端 + APP端）</h4>
+<ul>
+  <li><strong>数据来源：</strong>实时对接绿云PMS，房态自动同步，无需手动维护</li>
+  <li><strong>房态编码体系：</strong>
+    <table>
+      <tr><th>编码</th><th>含义</th><th>编码</th><th>含义</th></tr>
+      <tr><td>VC</td><td>净空房（Vacant Clean）</td><td>OC</td><td>净住房（Occupied Clean）</td></tr>
+      <tr><td>VD</td><td>脏空房（Vacant Dirty）</td><td>OD</td><td>脏住房（Occupied Dirty）</td></tr>
+      <tr><td>OOO</td><td>维修房（Out Of Order）</td><td>OS</td><td>停用房（Out Of Service）</td></tr>
+      <tr><td>DND</td><td>请勿打扰（Do Not Disturb）</td><td>预退/预到</td><td>预计退房/预计到店</td></tr>
+      <tr><td>锁房</td><td>锁定不可售</td><td>长租/钟点</td><td>长租房/钟点房</td></tr>
+    </table>
+  </li>
+  <li><strong>清洁状态叠加：</strong>在PMS房态基础上叠加蓝豆云清洁状态图标——待清洁、清洁中、暂停清洁、待检查、完成清洁、加急清洁</li>
+  <li><strong>筛选维度：</strong>楼栋、房型、房号/客人姓名搜索</li>
+  <li><strong>统计概览：</strong>入住率（如133/177）、各状态房间数量汇总（净空39、净住123、脏空10、待清洁2、清洁中2、待检查5、完成清洁166、预退3、预到7、工程报修36、续住80等）</li>
+  <li><strong>APP端房态图：</strong>按楼层分组卡片式展示，支持操作下拉菜单</li>
+</ul>
+
+<h4>3.1.2 每日分配（分配做房）</h4>
+<ul>
+  <li><strong>分配方式：</strong>PC端可视化拖拽分配，按人员分组显示已分配房间</li>
+  <li><strong>分配维度：</strong>按领班/主管→楼层服务员层级，每人负责指定楼层</li>
+  <li><strong>房间卡片：</strong>房号+房态颜色+清洁状态图标，支持多选批量分配</li>
+  <li><strong>负载监控：</strong>每人显示已分配房量/分值（如"18.5分/18间，住9退9"），顶部显示超时数、在线/离线人数</li>
+  <li><strong>未分配提醒：</strong>"3间需清洁客房未分配"红色提示</li>
+  <li><strong>分配结果：</strong>服务员APP端"客房清洁"列表自动显示分配给本人的任务</li>
+</ul>
+
+<h3>3.2 客房清洁模块</h3>
+<h4>3.2.1 清洁任务列表（APP端）</h4>
+<ul>
+  <li><strong>三个Tab：</strong>清洁任务、清洁检查、空房检查</li>
+  <li><strong>清洁进度条：</strong>实时显示"9/19(退10住9)"——已完成/总数(退房数/住房数)</li>
+  <li><strong>任务分类（按优先级）：</strong>
+    <ol>
+      <li><strong>客人要求打扫</strong>（催清洁，带时钟图标，最高优先）</li>
+      <li><strong>赶房</strong>（催赶房，加急优先）</li>
+      <li><strong>普通清洁</strong>（按楼层分组，如"主楼15F 还有退房6,住房3"）</li>
+    </ol>
+  </li>
+  <li><strong>房间状态标签：</strong>已退、住房、预退，颜色区分</li>
+  <li><strong>已完成标记：</strong>蓝色对勾勾选</li>
+  <li><strong>排序方式（可配置）：</strong>
+    <table>
+      <tr><th>任务类型</th><th>排序选项</th></tr>
+      <tr><td>赶房</td><td>按房间号 / 按下单时间最早</td></tr>
+      <tr><td>客人要求打扫</td><td>按房间号 / 按要求打扫时间最早</td></tr>
+      <tr><td>普通清洁</td><td>按房间号 / 按清洁类型(空住钟退) / 按预到时间最早</td></tr>
+    </table>
+  </li>
+  <li><strong>右上角快捷入口：</strong>"+布草/酒水"（快速登记布草消耗）</li>
+</ul>
+
+<h4>3.2.2 清洁执行详情页（APP端）</h4>
+<ul>
+  <li><strong>房间信息头：</strong>房号+清洁类型（如"01509【在住房清洁】"）、房量1.0/分值1.0、房型（商务双床房）</li>
+  <li><strong>注意提示：</strong>在住房显示"注意：客人在住，进门请敲门，礼貌用语"</li>
+  <li><strong>清洁计时：</strong>状态（清洁中）+ 已用时长（00:11）+ 开始时间（13:24开始清洁...）</li>
+  <li><strong>客人信息：</strong>当前客人姓名、入住时间、退房时间、入住方式（散客房/团队）、当前入住第X天、"查看更多"展开</li>
+  <li><strong>关联操作入口：</strong>
+    <ul>
+      <li>查房，查遗留/异常/消费</li>
+      <li>布草/易耗品</li>
+      <li>工程维修（显示共计N项）</li>
+      <li>周期卫生任务</li>
+    </ul>
+  </li>
+  <li><strong>底部操作按钮：</strong>更多（三点菜单）、暂停清洁、完成清洁</li>
+  <li><strong>工单号：</strong>全局唯一标识（如122558383）</li>
+  <li><strong>完成后状态：</strong>显示"已完成 34:06，09:22清洁完成"</li>
+</ul>
+
+<h3>3.3 清洁检查模块</h3>
+<h4>3.3.1 检查任务列表</h4>
+<ul>
+  <li>房态图视图，按楼层分组，房间卡片显示"住清洁/退清洁"状态</li>
+  <li>统计栏：已检查X间、未清洁X间、已取消、已检查X间（按楼层分别统计）</li>
+  <li>颜色区分：当前房态颜色+检查状态叠加</li>
+</ul>
+
+<h4>3.3.2 单房检查详情</h4>
+<ul>
+  <li><strong>房间信息：</strong>房号+清洁类型（如"01316【退房清洁】"）、房量/分值、房型、注意提示（客人已退房）</li>
+  <li><strong>检查信息：</strong>待检查状态、检查时间（开始-结束）、检查耗时、清洁人（如外协4）</li>
+  <li><strong>当前客人：</strong>无（退房）/ 客人信息（在住）</li>
+  <li><strong>关联操作：</strong>查房查遗留、布草/易耗品、工程维修</li>
+  <li><strong>更多操作菜单（三点）：</strong>
+    <ul>
+      <li>无法查房（特殊情况标记）</li>
+      <li>无需清洁房间（跳过）</li>
+      <li>更换检查人</li>
+      <li>更换清洁人（打回重做）</li>
+      <li>编辑信息</li>
+    </ul>
+  </li>
+  <li><strong>检查结果：</strong>通过 / 不通过（双按钮）</li>
+</ul>
+
+<h4>3.3.3 批量检查</h4>
+<ul>
+  <li>按楼层分组展示待检查房间，支持全选/多选</li>
+  <li>房间状态标记：脏空、脏住、脏胜等</li>
+  <li>底部批量操作：不通过 / 通过</li>
+  <li>支持横向滚动楼层视图</li>
+</ul>
+
+<h3>3.4 赶房管理模块</h3>
+<ul>
+  <li><strong>新建赶房单（PC前台）：</strong>
+    <ul>
+      <li>地点：房号选择/批量选择</li>
+      <li>清洁人：自动匹配（空闲优先）/ 手动指定</li>
+      <li>查房主管：自动匹配 / 手动指定</li>
+      <li>清洁要求：文本输入</li>
+      <li>客人手机号：选填，勾选"赶房完成发送短信"自动通知</li>
+    </ul>
+  </li>
+  <li><strong>赶房列表：</strong>房号、时间、赶房进度（已完成；可通知客人入住，赶房已完成）、耗时、清洁人、查房主管、创建人、下单/完成时间、编号</li>
+  <li><strong>APP端联动：</strong>赶房任务在清洁列表中最高优先级，"按下单时间最早"排序</li>
+  <li><strong>超时标准：</strong>赶房(所有房型) 40分钟（服务标准配置）</li>
+  <li><strong>提示引导：</strong>"建议查看'房态图'，优先赶待检查和清洁中的房间"</li>
+</ul>
+
+<h3>3.5 工单管理模块</h3>
+<h4>3.5.1 工单类型体系</h4>
+<table>
+  <tr><th>大类</th><th>具体类型</th><th>发起方</th><th>说明</th></tr>
+  <tr><td rowspan="3">服务工单</td><td>物品/服务</td><td>前台/客人/OTA</td><td>送物、开门、借物等通用服务</td></tr>
+  <tr><td>住房打扫</td><td>前台/客人</td><td>在住房临时打扫请求</td></tr>
+  <tr><td>夜床服务</td><td>系统/前台</td><td>开夜床，APP独立Tab</td></tr>
+  <tr><td rowspan="2">报修</td><td>客人报修</td><td>前台/客人</td><td>客人房间设施故障</td></tr>
+  <tr><td>内部报修</td><td>服务员/主管</td><td>清洁中发现的设施问题</td></tr>
+  <tr><td rowspan="5">其他</td><td>客房自查</td><td>服务员</td><td>在住/退房房间自查遗留/消费</td></tr>
+  <tr><td>客人换房</td><td>前台</td><td>客人换房服务</td></tr>
+  <tr><td>遗留查找</td><td>前台/客人</td><td>客人遗留物品查找</td></tr>
+  <tr><td>客人催服务</td><td>前台/客人</td><td>催办已发起的服务</td></tr>
+  <tr><td>内务单</td><td>内部</td><td>部门内部事务</td></tr>
+</table>
+
+<h4>3.5.2 工单创建（前台PC）</h4>
+<ul>
+  <li><strong>服务类型选择：</strong>6个图标入口——物品/服务、住房打扫、遗留查找、客人催服务、客人换房、客人报修</li>
+  <li><strong>地点：</strong>输入房号联想（如"14"→列出主楼14F所有房间），支持批量选择</li>
+  <li><strong>内容：</strong>服务/物品选择，数量，"+添加内容"可多项</li>
+  <li><strong>服务时间：</strong>现在服务（立即）/ 定时服务（预约）</li>
+  <li><strong>处理人：</strong>自动匹配（显示"客房部: 黄小林(高级服务员,空闲)"）/ 查看匹配 / 添加处理人</li>
+  <li><strong>工单特点：</strong>需要回复（处理后需回复客人）、抄送主管</li>
+  <li><strong>备注：</strong>文本输入</li>
+  <li><strong>右侧联动：</strong>客人信息（姓名、入住/退房时间、入住方式、常用服务/物品）+ 今日房间服务记录历史</li>
+</ul>
+
+<h4>3.5.3 工单状态流转</h4>
+<div class="flow-step"><strong>待接收/待派工</strong> → 工单已创建，等待处理人接收或系统派工</div>
+<div class="flow-step"><strong>处理中</strong> → 处理人已接收，正在执行（计时开始）</div>
+<div class="flow-step"><strong>已完成</strong> → 处理完成（记录完成时间、耗时）</div>
+<div class="flow-step"><strong>已取消</strong> → 工单取消（记录取消原因）</div>
+<div class="flow-step"><strong>已挂起</strong> → 特殊情况暂停（右键菜单操作）</div>
+<p><strong>PC端右键操作：</strong>代完成（前台代为标记完成）、取消、挂起、客人催服务</p>
+
+<h4>3.5.4 APP端"我的工单"</h4>
+<ul>
+  <li>顶部分类Tab（横向滚动）：分配给我、即时工单、客房清洁、夜床服务、周期工单、培训工单、我创建的、群发通知、我的成果、打赏记录</li>
+  <li>红点角标提示未读数量（如夜床服务5）</li>
+  <li>空状态："列表为空"</li>
+</ul>
+
+<h4>3.5.5 PC端"全部工单"</h4>
+<ul>
+  <li>顶部Tab：全部类型、物品/服务、客人催服务、打扫房间、客人换房、遗留查找、内务单、客人报修</li>
+  <li>操作按钮：新建服务单、新建内务单、全部状态筛选、高级搜索、工单导出</li>
+  <li>范围切换：全部工单 / 本部门服务 / 我所下工单</li>
+  <li>列表列：地点、时间、内容、状态、耗时、备注、处理人、创建人、下单时间、完成时间、编号、超时/异常、单价、结算金额、微信支付单号</li>
+  <li>超时/异常标记：红色"超时"、"异常"标签</li>
+  <li>客人对话图标：绿色聊天气泡表示有客人沟通记录</li>
+  <li>创建人来源：前厅部（胡秋汝/肖光宗）、前台夜班、客人手机号（OTA自助下单）</li>
+</ul>
+
+<h3>3.6 对客服务模块</h3>
+<h4>3.6.1 物品/服务送物</h4>
+<ul>
+  <li><strong>物品种类（携程宾客服务分类）：</strong>
+    <ul>
+      <li><strong>个人用品：</strong>洗面奶、卸妆水、卫生巾、皮筋/发夹、棉签、剃须刀、打火机、指甲刀、充电线(安卓/苹果/三充)、暖宝宝、眼罩、枕头(荞麦枕/记忆枕)、筷子、刀叉、红酒杯、定型喷雾、发胶、牙线、衣架、耳塞</li>
+      <li><strong>儿童用品：</strong>儿童澡盆、儿童拖鞋、儿童洗护用品、书籍、婴儿床</li>
+      <li><strong>适老用品：</strong>老花镜、泡脚盆</li>
+      <li><strong>办公用品：</strong>橡皮擦、订书机、起订器、信纸、笔、计算器、涂改液、回形针、胶水、透明胶、双面胶、打印复印、文件袋、插排、鼠标、剪刀</li>
+      <li><strong>常规消耗品：</strong>矿泉水、牙具(A/B)、牙膏、梳子、浴帽、护理包、面巾纸、卷纸、小垃圾袋、杯盖等</li>
+    </ul>
+  </li>
+  <li><strong>下单渠道：</strong>前台代客下单、客人携程小程序自助下单（"宾客服务 一键呼叫，急速响应"）、客人电话</li>
+  <li><strong>超时标准：</strong>物品6分钟、服务6分钟、催服务6分钟</li>
+</ul>
+
+<h4>3.6.2 投诉预警</h4>
+<ul>
+  <li><strong>投诉单列表：</strong>编号、状态（待派工/已完成）、耗时、地点、内容、投诉等级、创建人、处理人、下单/完成时间、投诉详情</li>
+  <li><strong>内容分类：</strong>物品有遗漏、客房卫生、房间卫生问题、服务问题、客房卫生设备故障、其他</li>
+  <li><strong>操作：</strong>新建投诉单、高级搜索、全部状态/部门筛选、工单导出</li>
+  <li><strong>未派工提醒：</strong>右上角"未派工单32张"</li>
+</ul>
+
+<h4>3.6.3 客人档案</h4>
+<ul>
+  <li><strong>搜索：</strong>输入客人姓名搜索</li>
+  <li><strong>客人卡片：</strong>
+    <ul>
+      <li>客人偏好（标签化记录）</li>
+      <li>常用服务/物品（如"矿泉水"）</li>
+      <li>历史入住记录（时间、房号）</li>
+      <li>服务历史记录（时间、服务类型、内容）</li>
+      <li>"历史记录>>"查看完整历史</li>
+    </ul>
+  </li>
+  <li><strong>价值：</strong>前台创建工单时自动展示客人偏好和历史服务，提供个性化服务</li>
+</ul>
+
+<h3>3.7 布草/易耗品管理模块</h3>
+<h4>3.7.1 布草配置（PC端设置）</h4>
+<ul>
+  <li>按房型配置每种布草的标准数量，标注"(住退)"表示住客/退房通用</li>
+  <li><strong>布草种类：</strong>各尺寸床单（1.3米/1.5米/1.8米/2.6米）、各尺寸被套、枕套、浴巾、面巾、方巾、地巾、浴袍</li>
+  <li><strong>配置示例（颐馨大床房）：</strong>1.8米床单×1、1.8米被套×1、枕套×4、浴巾×2、面巾×2、方巾×2、地巾×1</li>
+  <li>易耗品Tab（可独立配置，图中显示"未设置"）</li>
+</ul>
+
+<h4>3.7.2 清洁中布草更新（APP端）</h4>
+<ul>
+  <li><strong>双Tab：</strong>布草(7)、易耗品(5)</li>
+  <li><strong>自动预估：</strong>根据房型自动带出"预估的布草(颐馨大床房)"，默认勾选标准数量（如1.8米床单1、被套1、枕套4、浴巾1、面巾1、方巾1、地巾1）</li>
+  <li><strong>手动调整：</strong>
+    <ul>
+      <li>客房布草区域可额外添加（2.6米床单/被套、1.5米/1.3米床单被套、浴袍等）</li>
+      <li>数量选择：1/2/3/4/更多（快捷按钮）</li>
+      <li>关键词快速搜索</li>
+    </ul>
+  </li>
+  <li><strong>两种模式：</strong>默认预估（系统带出）/ 手工更新（从零勾选）</li>
+  <li>确定后记录本次清洁消耗的布草/易耗品</li>
+</ul>
+
+<h4>3.7.3 布草消耗记录</h4>
+<ul>
+  <li>"今天的布草/易耗品/消费"列表，按时间倒序</li>
+  <li>每条记录：时间、操作人、消耗明细（逐项列出物品×数量）、备注</li>
+  <li>底部"点击添加布草/易耗品"快捷登记</li>
+  <li>右上角"+"新增</li>
+</ul>
+
+<h4>3.7.4 布草酒水统计</h4>
+<ul>
+  <li><strong>三种查看维度：</strong>按地点查看（楼层）、按员工查看、按物品查看</li>
+  <li><strong>时间筛选：</strong>今天 / 自定义</li>
+  <li><strong>按地点示例：</strong>
+    <ul>
+      <li>主楼14F：浴巾3、面巾4、方巾4、地巾2、B牙具1、牙膏3、梳子1、面巾纸2、卷纸3、小垃圾袋5、矿泉水12</li>
+      <li>主楼15F：1.8米床单3、1.8米被套3、枕套12、浴巾5、面巾3、方巾5、地巾4、A牙具2、B牙具2、牙膏1、梳子2、浴帽3、护理包1、卷纸3、小垃圾袋2、杯盖2、矿泉水12</li>
+      <li>主楼17F：2.6米床单1、2.6米被套1</li>
+    </ul>
+  </li>
+  <li>全部地点汇总 / 单楼层展开</li>
+</ul>
+
+<h3>3.8 工程维修模块</h3>
+<ul>
+  <li><strong>维修单类型：</strong>普通单、紧急单</li>
+  <li><strong>工单信息：</strong>工单号、对象（如普通灯）、内容（如常亮）、报修备注（如书桌上方射灯不断电）、报修人（姓名+部门）、进展（报修时间）、维修备注</li>
+  <li><strong>状态：</strong>待派工 → 维修中 → 已完成</li>
+  <li><strong>操作：</strong>重新维修（打回）、验收通过（确认修复）</li>
+  <li><strong>入口：</strong>APP清洁详情页"工程维修"入口（显示共计N项）、APP新建工单"客人报修/内部报修"、PC端客人报修Tab</li>
+  <li><strong>房态图标记：</strong>工程报修房间在房态图显示数量（如工程报修36）</li>
+</ul>
+
+<h3>3.9 查房与遗留模块</h3>
+<h4>3.9.1 退房检查</h4>
+<ul>
+  <li><strong>列表：</strong>房号、时间、状态（已完成）、备注、检查结果（通过/异常）、耗时、工单号、创建人、处理人、下单/完成时间</li>
+  <li><strong>操作：</strong>输入房号查房、快速下单、新建查房单</li>
+  <li><strong>范围：</strong>我所下工单 / 全部工单</li>
+  <li>异常结果红色标记，通过绿色对勾</li>
+</ul>
+
+<h4>3.9.2 客房自查</h4>
+<ul>
+  <li>提示："客房自查房，包含了客人在住/退房等房间，不一定都是已退的房间哦~"</li>
+  <li>列表：房号、时间、结果（遗留/消费标签）、备注、创建人、下单时间、工单号</li>
+  <li>结果分类：遗留（蓝色标签）、消费（黄色标签）</li>
+</ul>
+
+<h4>3.9.3 查房结果登记</h4>
+<ul>
+  <li><strong>四类结果：</strong>
+    <ol>
+      <li><strong>消费</strong>：添加消费项目（如矿泉水、食品等）</li>
+      <li><strong>遗留</strong>：添加遗留物品（分类选择）</li>
+      <li><strong>客房状态</strong>：添加房态异常</li>
+      <li><strong>备注</strong>：文本说明"继续补充酒水、遗留物信息，记录客房异常或损坏..."</li>
+    </ol>
+  </li>
+  <li><strong>图片上传：</strong>"+"按钮拍照上传证据</li>
+  <li><strong>遗留物品分类：</strong>
+    <ul>
+      <li>生活用品：衣服、鞋、手提包、化妆品、钱包、雨伞、首饰、证件</li>
+      <li>数码产品：手机、充电器</li>
+      <li>其他：其他遗留物</li>
+    </ul>
+  </li>
+</ul>
+
+<h4>3.9.4 借物及归还记录</h4>
+<ul>
+  <li><strong>筛选：</strong>时间（今天）、楼层（全部楼层）、状态（退房/全部）</li>
+  <li><strong>未归还汇总：</strong>"总未归还3件"</li>
+  <li><strong>每条记录：</strong>房号、客人姓名、入住日期范围、借物明细（物品×数量，未归还红色标记）、备注</li>
+  <li><strong>操作：</strong>添加备注、点击归还借物</li>
+  <li><strong>示例物品：</strong>荞麦枕、电吹风、针线包等</li>
+</ul>
+
+<h3>3.10 人员与排班模块</h3>
+<h4>3.10.1 员工班表（PC客房管家）</h4>
+<ul>
+  <li><strong>日期选择：</strong>按日期设置（如2026-07-31）</li>
+  <li><strong>三班制：</strong>
+    <ul>
+      <li>早班 08:00~16:30</li>
+      <li>中班 16:30~00:00</li>
+      <li>晚班 00:00~08:00</li>
+    </ul>
+  </li>
+  <li><strong>班次时间设置：</strong>可自定义各班次时间</li>
+  <li><strong>添加值班地点：</strong>勾选后为每人分配负责楼层</li>
+  <li><strong>人员角色：</strong>经理、主管、高级服务员、楼层服务员、外协</li>
+  <li><strong>示例配置：</strong>早班7人（2主管+2高级+2楼层+1外协），中班2人，晚班1人（前台夜班专用）</li>
+</ul>
+
+<h4>3.10.2 服务排班（PC前台）</h4>
+<ul>
+  <li>矩阵视图：行=楼层（13F-25F），列=早班/中班/晚班</li>
+  <li>每个单元格填写该楼层该班次值班人员</li>
+  <li>晚班默认"前台夜班专用"</li>
+  <li>左下角"特例分类"（特殊排班规则）</li>
+  <li>设置/保存按钮</li>
+</ul>
+
+<h4>3.10.3 人员状态（APP端）</h4>
+<ul>
+  <li>"处理人"选择页面，按部门筛选（如客房部）</li>
+  <li>列表显示：姓名 + 状态（空闲/绿色，忙/橙色）</li>
+  <li>支持多选（复选框），用于批量分配任务</li>
+  <li>搜索关键词快速找人</li>
+</ul>
+
+<h4>3.10.4 值班地点</h4>
+<ul>
+  <li>APP端首页顶部提示"请先完成今日值班地点设置..."</li>
+  <li>服务员每日设置自己负责的楼层区域</li>
+  <li>做工统计可按"我的值班地点"或"全部地点"筛选</li>
+</ul>
+</section>
+
+<!-- ==================== 4. 服务员/领班侧 手机端 ==================== -->
+<section id="s4">
+<h2>四、服务员/领班侧 — 手机端APP产品设计</h2>
+
+<h3>4.1 产品定位</h3>
+<p>手机端APP是<strong>房务执行与工单处理的移动工作台</strong>，面向客房服务员和领班/主管。服务员聚焦"清洁执行+工单处理"，领班/主管增加"检查+分配+管理"能力。</p>
+
+<h3>4.2 APP首页结构</h3>
+<div class="arch-box">
+  <div class="arch-card">
+    <h4>顶部栏</h4>
+    <ul>
+      <li>值班地点设置提示（"请先完成今日值班地点设置"）</li>
+      <li>菜单按钮（右上角三横线）</li>
+    </ul>
+  </div>
+  <div class="arch-card">
+    <h4>四大功能入口</h4>
+    <ul>
+      <li><strong>新建工单</strong>（绿色+图标）——新建服务、报修、客房自查等工单</li>
+      <li><strong>我的工单</strong>（橙色列表图标）——显示"暂无新工单"或数量</li>
+      <li><strong>服务管理</strong>（红色铃铛图标）——显示"有3个未读提醒"</li>
+      <li><strong>客房管理</strong>（绿色房子图标）——分配清洁、查看清洁进度、房态图等</li>
+    </ul>
+  </div>
+</div>
+
+<h3>4.3 服务员核心功能</h3>
+
+<h4>4.3.1 客房清洁（核心中的核心）</h4>
+<table>
+  <tr><th style="width:25%">功能点</th><th>设计说明</th></tr>
+  <tr><td>任务列表</td><td>三Tab（清洁任务/清洁检查/空房检查），按赶房→客人要求打扫→普通清洁优先级排序，楼层分组</td></tr>
+  <tr><td>进度可视</td><td>顶部进度条"9/19(退10住9)"，每层显示"还有退房6,住房3"</td></tr>
+  <tr><td>排序配置</td><td>赶房按下单时间/房间号；客人要求打扫按要求时间/房间号；普通清洁按房间号/清洁类型/预到时间</td></tr>
+  <tr><td>清洁执行</td><td>开始→计时中→暂停/完成，全程自动计时，记录开始/完成时间</td></tr>
+  <tr><td>客人信息</td><td>姓名、入住/退房时间、入住天数、散客/团队、在住房提示敲门礼貌用语</td></tr>
+  <tr><td>房量分值</td><td>每间房显示房量1.0/分值1.0（按房型配置），用于计件统计</td></tr>
+  <tr><td>关联操作</td><td>查房遗留/异常/消费、布草/易耗品更新、工程维修、周期卫生任务</td></tr>
+</table>
+
+<h4>4.3.2 我的工单</h4>
+<ul>
+  <li>10个分类Tab：分配给我、即时工单、客房清洁、夜床服务、周期工单、培训工单、我创建的、群发通知、我的成果、打赏记录</li>
+  <li>红点角标未读提醒</li>
+  <li>工单详情：地点、内容、状态、耗时、备注、处理人、创建人、下单时间</li>
+  <li>操作：接收、完成、添加备注、上传图片</li>
+</ul>
+
+<h4>4.3.3 新建工单</h4>
+<ul>
+  <li>底部弹窗"选择工单类型"：服务工单、客人报修、内部报修</li>
+  <li>选择后进入对应创建表单</li>
+</ul>
+
+<h4>4.3.4 查房与遗留登记</h4>
+<ul>
+  <li>清洁完成后进入"查房,查遗留/异常/消费"</li>
+  <li>四类登记：消费、遗留（生活用品/数码产品/其他细分）、客房状态、备注+图片</li>
+  <li>遗留物品标准化分类选择，减少输入</li>
+</ul>
+
+<h4>4.3.5 布草/易耗品更新</h4>
+<ul>
+  <li>系统按房型自动预估布草（默认勾选标准数量）</li>
+  <li>服务员可手动增减（1-4快捷按钮/更多）</li>
+  <li>布草Tab + 易耗品Tab，关键词搜索</li>
+  <li>确定后自动记录消耗，汇入布草统计</li>
+</ul>
+
+<h4>4.3.6 工程报修</h4>
+<ul>
+  <li>清洁中发现设施问题，直接在清洁详情页点"工程维修"创建</li>
+  <li>填写：对象、内容、报修备注、拍照</li>
+  <li>提交后流转工程部，可查看维修进度</li>
+  <li>维修完成后"验收通过"确认</li>
+</ul>
+
+<h4>4.3.7 借物归还</h4>
+<ul>
+  <li>查看本人负责楼层的借物未归还记录</li>
+  <li>客人退房时核对借物，点击"归还借物"销账</li>
+  <li>添加备注</li>
+</ul>
+
+<h4>4.3.8 做工统计（个人）</h4>
+<ul>
+  <li>查看个人当日/历史做工数据</li>
+  <li>分配间数、已清洁间数/分值、超额分、通过率</li>
+  <li>按值班地点/全部地点筛选</li>
+  <li>"结算"功能（计件工资核算依据）</li>
+</ul>
+
+<h3>4.4 领班/主管增加功能</h3>
+
+<h4>4.4.1 清洁检查</h4>
+<ul>
+  <li>进入"清洁检查"Tab，查看待检查房间列表（房态图视图）</li>
+  <li>单房检查：查看清洁人、清洁耗时、客人信息，通过/不通过</li>
+  <li>不通过可"更换清洁人"打回重做</li>
+  <li>特殊情况：无法查房、无需清洁房间</li>
+  <li>批量检查：按楼层多选，批量通过/不通过，提升检查效率</li>
+  <li>空房检查独立Tab</li>
+</ul>
+
+<h4>4.4.2 客房管理（管理菜单）</h4>
+<table>
+  <tr><th style="width:30%">功能</th><th>说明</th></tr>
+  <tr><td>客房状态</td><td>APP端房态图，查看全酒店房态+清洁状态</td></tr>
+  <tr><td>分配做房</td><td>手机端分配清洁任务给服务员</td></tr>
+  <tr><td>房间抽查</td><td>主管随机抽查房间清洁质量</td></tr>
+  <tr><td>换房</td><td>处理客人换房后的房务调整</td></tr>
+  <tr><td>布草酒水统计</td><td>按地点/员工/物品查看消耗统计</td></tr>
+  <tr><td>借物及归还记录</td><td>全局借物归还跟踪</td></tr>
+  <tr><td>做房清洁记录</td><td>历史清洁记录查询</td></tr>
+  <tr><td>周期卫生</td><td>周期卫生任务管理（如地毯清洗、空调清洗等）</td></tr>
+  <tr><td>清洁检查排班</td><td>安排检查人员排班</td></tr>
+  <tr><td>服务排班</td><td>查看/安排服务人员排班</td></tr>
+</table>
+
+<h4>4.4.3 服务管理</h4>
+<ul>
+  <li>接收服务提醒（未读提醒红点）</li>
+  <li>处理对客服务工单</li>
+  <li>群发通知（向服务员群发消息）</li>
+</ul>
+
+<h4>4.4.4 人员状态监控</h4>
+<ul>
+  <li>查看客房部所有人员空闲/忙状态</li>
+  <li>分配任务时选择空闲人员</li>
+  <li>多选批量分配</li>
+</ul>
+
+<h3>4.5 APP端设计特点总结</h3>
+<div class="grid-2">
+  <div class="module-card">
+    <h4>执行效率优先</h4>
+    <ul>
+      <li>布草自动预估，减少80%输入</li>
+      <li>遗留物品分类选择，不用打字</li>
+      <li>清洁一键开始/完成，计时自动</li>
+      <li>大按钮适合单手/戴手套操作</li>
+    </ul>
+  </div>
+  <div class="module-card">
+    <h4>信息充分但不干扰</h4>
+    <ul>
+      <li>客人信息折叠展示，"查看更多"展开</li>
+      <li>在住房主动提示敲门礼貌用语</li>
+      <li>任务按优先级自动排序，不用自己找</li>
+      <li>进度条实时反馈，激励完成</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+<!-- ==================== 5. 前台侧 PC端住客服务管家 ==================== -->
+<section id="s5">
+<h2>五、前台侧 — PC端住客服务管家产品设计</h2>
+
+<h3>5.1 产品定位</h3>
+<p>住客服务管家是<strong>前厅部对客服务的调度与跟踪工作台</strong>，核心目标是"快速响应客人需求、全程跟踪服务闭环、积累客人偏好档案"。前台通过此系统发起和跟踪所有对客服务工单，同时管理赶房、退房检查、投诉等关键服务场景。</p>
+
+<h3>5.2 工作台整体布局</h3>
+<div class="arch-box">
+  <div class="arch-card">
+    <h4>左侧导航栏（11个模块）</h4>
+    <ol>
+      <li><strong>查房</strong>（子菜单：退房检查、客房自查）</li>
+      <li><strong>赶房</strong>（子菜单：赶房清洁、房态图）</li>
+      <li><strong>对客服务</strong></li>
+      <li><strong>行李寄存</strong></li>
+      <li><strong>住客反馈</strong></li>
+      <li><strong>服务排班</strong></li>
+      <li><strong>服务标准</strong></li>
+      <li><strong>报表</strong></li>
+      <li><strong>投诉预警</strong></li>
+      <li><strong>客人档案</strong></li>
+    </ol>
+  </div>
+  <div class="arch-card">
+    <h4>顶部操作栏</h4>
+    <ul>
+      <li>新建服务单 / 新建内务单（核心入口）</li>
+      <li>全部状态筛选</li>
+      <li>高级搜索</li>
+      <li>工单导出</li>
+      <li>范围切换：全部工单 / 本部门服务 / 我所下工单</li>
+    </ul>
+  </div>
+  <div class="arch-card">
+    <h4>右下角消息提醒</h4>
+    <ul>
+      <li>携程消息打通（ebook.ctrip.com）</li>
+      <li>分类：全部 / 超时 / 回复 / 离线 / 未派工</li>
+      <li>实时弹窗提醒新工单/超时工单</li>
+    </ul>
+  </div>
+</div>
+
+<h3>5.3 核心功能详解</h3>
+
+<h4>5.3.1 对客服务（核心模块）</h4>
+<p><strong>工单列表视图：</strong></p>
+<ul>
+  <li>顶部8个Tab快速筛选：全部类型、物品/服务、客人催服务、打扫房间、客人换房、遗留查找、内务单、客人报修</li>
+  <li>列表列：地点（房号）、时间、内容（服务类型图标+名称）、状态、耗时、备注、处理人、创建人、下单时间、完成时间、编号、超时/异常、单价、结算金额、微信支付单号</li>
+  <li>状态颜色：已完成（绿色）、处理中（蓝色）、待接收（橙色）、已取消（灰色）</li>
+  <li>超时/异常红色标签突出显示</li>
+  <li>客人对话图标（绿色气泡）表示有沟通记录</li>
+  <li>右键菜单：代完成、取消、挂起、客人催服务</li>
+  <li>数据范围：默认显示近4个月，支持高级搜索和导出</li>
+</ul>
+
+<p><strong>新建服务单流程：</strong></p>
+<div class="flow-step"><strong>步骤1：选择服务类型</strong> —— 6个图标：物品/服务、住房打扫、遗留查找、客人催服务、客人换房、客人报修</div>
+<div class="flow-step"><strong>步骤2：填写工单信息</strong> —— 地点（房号联想/批量）、内容（物品/服务选择+数量）、服务时间（现在/定时）、处理人（自动匹配空闲人员，显示姓名+职位+状态）、工单特点（需要回复/抄送主管）、备注</div>
+<div class="flow-step"><strong>步骤3：确认客人信息</strong> —— 右侧自动展示在住客人姓名、入住/退房时间、入住方式、常用服务/物品、今日房间服务记录历史</div>
+<div class="flow-step"><strong>步骤4：提交派单</strong> —— 系统自动派单给匹配人员，APP端即时接收，开始计时</div>
+
+<h4>5.3.2 赶房管理</h4>
+<ul>
+  <li><strong>赶房清洁列表：</strong>房号、时间、赶房进度（"已完成；可通知客人入住，赶房已完成"）、耗时、清洁人、查房主管、创建人、下单/完成时间、编号</li>
+  <li><strong>新建赶房单：</strong>
+    <ul>
+      <li>地点（批量选择）</li>
+      <li>清洁人（自动匹配/手动指定）</li>
+      <li>查房主管（自动匹配/手动指定）</li>
+      <li>清洁要求（文本）</li>
+      <li>客人手机号（选填，赶房完成自动发短信通知）</li>
+    </ul>
+  </li>
+  <li><strong>房态图联动：</strong>赶房模块内嵌房态图入口，提示"建议查看'房态图'，优先赶待检查和清洁中的房间"</li>
+  <li><strong>超时标准：</strong>赶房40分钟（服务标准配置）</li>
+</ul>
+
+<h4>5.3.3 查房管理</h4>
+<p><strong>退房检查：</strong></p>
+<ul>
+  <li>列表：房号、时间、状态、备注、检查结果（通过✓/异常⚠）、耗时、工单号、创建人、处理人、下单/完成时间</li>
+  <li>快捷操作：输入房号查房、快速下单、新建查房单</li>
+  <li>范围：我所下工单 / 全部工单</li>
+  <li>默认显示近6个月数据</li>
+</ul>
+<p><strong>客房自查：</strong></p>
+<ul>
+  <li>提示："客房自查房，包含了客人在住/退房等房间，不一定都是已退的房间哦~"</li>
+  <li>列表：房号、时间、结果（遗留🔵/消费🟡标签）、备注、创建人、下单时间、工单号</li>
+  <li>默认显示近6个月数据</li>
+</ul>
+
+<h4>5.3.4 投诉预警</h4>
+<ul>
+  <li><strong>列表：</strong>编号、状态（待派工/已完成）、耗时、地点、内容分类、投诉等级、创建人、处理人、下单/完成时间、投诉详情</li>
+  <li><strong>内容分类：</strong>物品有遗漏、客房卫生、房间卫生问题、服务问题、客房卫生设备故障、其他、测试单</li>
+  <li><strong>操作：</strong>新建投诉单、高级搜索、全部状态/部门筛选、工单导出</li>
+  <li><strong>未派工提醒：</strong>右上角红色"未派工单32张"</li>
+  <li><strong>投诉详情示例：</strong>物品遗漏、卫生问题、设施故障、服务态度等，记录具体描述</li>
+</ul>
+
+<h4>5.3.5 客人档案</h4>
+<ul>
+  <li><strong>搜索：</strong>输入客人姓名快速检索</li>
+  <li><strong>客人卡片信息：</strong>
+    <ul>
+      <li>客人偏好（标签化，如"矿泉水"偏好）</li>
+      <li>常用服务/物品（系统自动统计历史服务频次）</li>
+      <li>历史入住记录（日期+房号）</li>
+      <li>服务历史记录（时间+服务类型+内容）</li>
+      <li>"历史记录>>"查看完整档案</li>
+    </ul>
+  </li>
+  <li><strong>应用场景：</strong>创建工单时右侧自动展示该房间客人档案，前台可主动提供个性化服务（如客人偏好矿泉水，主动多送一瓶）</li>
+</ul>
+
+<h4>5.3.6 服务排班</h4>
+<ul>
+  <li>矩阵视图：楼层（13F-25F）× 班次（早班/中班/晚班）</li>
+  <li>每个单元格填写值班人员</li>
+  <li>晚班统一"前台夜班专用"</li>
+  <li>"特例分类"处理特殊排班规则</li>
+  <li>设置/保存</li>
+</ul>
+
+<h4>5.3.7 服务标准（超时规则配置）</h4>
+<ul>
+  <li><strong>超时时间配置（按角色分级提醒）：</strong>
+    <table>
+      <tr><th>服务类型</th><th>超时标准</th><th>服务类型</th><th>超时标准</th></tr>
+      <tr><td>打扫房间</td><td>40分钟</td><td>赶房(所有房型)</td><td>40分钟</td></tr>
+      <tr><td>催服务</td><td>6分钟</td><td>退房检查</td><td>10分钟</td></tr>
+      <tr><td>客人换房</td><td>6分钟</td><td>物品</td><td>6分钟</td></tr>
+      <tr><td>服务</td><td>6分钟</td><td></td><td></td></tr>
+    </table>
+  </li>
+  <li><strong>分级提醒：</strong>主管 → 经理 → 高层（超时后逐级升级通知）</li>
+  <li><strong>抄送和提醒：</strong>第二个Tab配置抄送规则</li>
+  <li>底部提示："*标准更改可登录云平台设置"</li>
+</ul>
+
+<h4>5.3.8 报表</h4>
+<ul>
+  <li><strong>对客服务统计：</strong>日报表（日期选择）、按小时统计柱状图（展示0-23点各时段服务量分布）、全部服务/分类型筛选</li>
+  <li><strong>工单导出：</strong>Excel格式导出工单明细</li>
+  <li>更多报表入口</li>
+</ul>
+
+<h4>5.3.9 房态图（前台视角）</h4>
+<ul>
+  <li>嵌入在赶房模块内，也可独立查看</li>
+  <li>房态编码+清洁状态叠加，与客房管家房态图数据一致</li>
+  <li>底部图例完整：净空、净住、脏空、脏住、维修、停用、待清洁、清洁中、待检查、完成清洁、加急、预退、预到、工程报修、续住等</li>
+  <li>搜索房号/房型</li>
+</ul>
+
+<h3>5.4 前台工作流设计</h3>
+<div class="flow-step"><strong>客人需求到达</strong> —— 渠道：客人电话/前台面对面/携程小程序自助/客房服务员转达</div>
+<div class="flow-step"><strong>前台创建工单</strong> —— 选择服务类型→输入房号→选择物品/服务→系统自动匹配空闲处理人→确认客人信息→提交</div>
+<div class="flow-step"><strong>自动派单+计时</strong> —— 服务员APP即时收到推送，接单后开始计时，超时前系统提醒</div>
+<div class="flow-step"><strong>跟踪+催办</strong> —— 前台在工单列表实时查看状态/耗时，超时可"客人催服务"升级，必要时"代完成"</div>
+<div class="flow-step"><strong>完成+闭环</strong> —— 服务员APP标记完成，记录完成时间和耗时，前台确认，客人偏好自动归档</div>
+<div class="flow-step"><strong>异常处理</strong> —— 投诉/差评进入投诉预警模块，指派处理人跟踪，记录详情和处理结果</div>
+</section>
+
+<!-- ==================== 6. 客房经理侧 PC端客房管家 ==================== -->
+<section id="s6">
+<h2>六、客房经理侧 — PC端客房管家产品设计</h2>
+
+<h3>6.1 产品定位</h3>
+<p>客房管家是<strong>客房部经理/主管的全局管理与决策工作台</strong>，核心目标是"统筹房务运营、优化人员配置、监控清洁质量、分析运营数据"。经理通过此系统完成每日任务分配、排班、房态监控、布草管理、报表分析和系统配置。</p>
+
+<h3>6.2 工作台整体布局</h3>
+<div class="arch-box">
+  <div class="arch-card">
+    <h4>左侧导航栏（6大模块）</h4>
+    <ol>
+      <li><strong>每日分配</strong> —— 分配做房、清洁人报表、进度跟踪</li>
+      <li><strong>房态图</strong> —— 全局房态+清洁状态监控</li>
+      <li><strong>客人相关</strong>（子菜单：退房检查、客房自查、赶房清洁、对客服务、投诉预警）</li>
+      <li><strong>员工班表</strong> —— 每日值班排班</li>
+      <li><strong>布草/酒水</strong> —— 布草配置、消耗统计</li>
+      <li><strong>设置</strong> —— 房型管理、分值配置、系统参数</li>
+    </ol>
+  </div>
+  <div class="arch-card">
+    <h4>顶部信息栏</h4>
+    <ul>
+      <li>酒店名称（如"长沙延年颐景酒店"）</li>
+      <li>通讯录、在线客服</li>
+      <li>当前用户（"你好，段小兵"）</li>
+      <li>退出登录</li>
+    </ul>
+  </div>
+</div>
+
+<h3>6.3 核心功能详解</h3>
+
+<h4>6.3.1 每日分配（核心模块）</h4>
+<p><strong>顶部功能区：</strong></p>
+<ul>
+  <li>日期切换（今天/前后日期）</li>
+  <li>7个业务Tab：客房清洁、夜床服务、清洁检查人、服务排班、空房检查、周期卫生</li>
+  <li>报表操作：清洁人报表、日报表导出、月报表导出、个人清洁量统计、更多报表</li>
+  <li>未分配提醒："3间需清洁客房未分配" + 编辑按钮</li>
+</ul>
+
+<p><strong>分配视图（拖拽式）：</strong></p>
+<ul>
+  <li>按人员分组展示，每人一行显示：姓名、负责楼层、职位、已分配房量/分值（如"23F-24F,楼层服务员 分配19间 完成9间/9分"）</li>
+  <li>展开后显示该人所有房间明细：房号、清洁类型（退房清洁/住房清洁）、班次、房型、状态、房量/分值、查房、检查人、清洁时间、检查时间、布草</li>
+  <li>房间状态图标：待清洁（灰色时钟）、取消清洁（红色）、清洁中（蓝色旋转）、暂停清洁、待检查（橙色）、检查通过、已完成/系统完成（绿色对勾）</li>
+  <li>顶部统计：超时数、在线/离线人数（如"5个超时，2个离线145个在线"）</li>
+  <li>搜索领班人、添加领班人</li>
+  <li>选择提示房间（如VD:00,非长租房）</li>
+  <li>底部图例 + 取消/确定</li>
+</ul>
+
+<p><strong>分配逻辑：</strong></p>
+<ul>
+  <li>系统根据PMS房态自动生成待清洁任务（退房脏房+在住需打扫房）</li>
+  <li>经理/主管按楼层和人员负载拖拽分配</li>
+  <li>每人显示分值负载，便于均衡分配（如早班基数12分）</li>
+  <li>分配后服务员APP即时显示任务</li>
+</ul>
+
+<h4>6.3.2 房态图</h4>
+<ul>
+  <li>全局房态一屏掌握，按楼栋/楼层展示</li>
+  <li>房态编码（VC/OC/VD/OD/OOO/OS等）+ 蓝豆云清洁状态叠加</li>
+  <li>入住率统计（如133/177）</li>
+  <li>筛选：楼栋、房型、搜索房号/客人姓名</li>
+  <li>操作下拉菜单（房间级操作）</li>
+  <li>与前台房态图、APP房态图数据实时同步</li>
+</ul>
+
+<h4>6.3.3 员工班表</h4>
+<ul>
+  <li><strong>日期选择：</strong>按日期排班（如2026-07-31）</li>
+  <li><strong>三班制：</strong>早班08:00-16:30、中班16:30-00:00、晚班00:00-08:00</li>
+  <li><strong>班次时间设置：</strong>可自定义各班次时间段</li>
+  <li><strong>添加值班地点：</strong>勾选后为每人分配负责楼层</li>
+  <li><strong>人员管理：</strong>添加经理/主管/服务员，显示角色（主管、高级服务员、楼层服务员、外协）</li>
+  <li><strong>每人信息：</strong>姓名(角色) + 值班地点（如"主楼19F,主楼20..."）</li>
+  <li>示例：早班7人（2主管+2高级+2楼层+1外协），中班2人，晚班1人</li>
+</ul>
+
+<h4>6.3.4 布草/酒水管理</h4>
+<p><strong>布草配置：</strong></p>
+<ul>
+  <li>按房型配置标准布草数量（住/退通用）</li>
+  <li>布草种类：2.6米/1.8米/1.5米/1.3米床单、被套、枕套、浴巾、面巾、方巾、地巾、浴袍</li>
+  <li>易耗品独立Tab配置</li>
+  <li>这是APP端"自动预估布草"的数据来源</li>
+</ul>
+<p><strong>布草酒水统计：</strong></p>
+<ul>
+  <li>三维度查看：按地点（楼层）、按员工、按物品</li>
+  <li>时间筛选</li>
+  <li>消耗明细汇总，用于成本核算和布草采购决策</li>
+</ul>
+
+<h4>6.3.5 设置（系统配置）</h4>
+<p><strong>房型管理与分值配置：</strong></p>
+<ul>
+  <li>三个Tab：编辑分值、编辑房型、新建房型</li>
+  <li><strong>分值配置表：</strong>
+    <table>
+      <tr><th>房型</th><th>清洁人职位</th><th>退房清洁</th><th>住房清洁</th><th>空房清洁</th></tr>
+      <tr><td>超级大床房</td><td>所有职位</td><td>1分</td><td>1分</td><td>0分</td></tr>
+      <tr><td>复式套房</td><td>所有职位</td><td>2分</td><td>2分</td><td>0分</td></tr>
+      <tr><td>亲子双床房</td><td>所有职位</td><td>1分</td><td>1分</td><td>0分</td></tr>
+      <tr><td>商务双床房</td><td>所有职位</td><td>1分</td><td>1分</td><td>0分</td></tr>
+      <tr><td>享浴大床房</td><td>所有职位</td><td>1分</td><td>1分</td><td>0分</td></tr>
+      <tr><td>行政大床房</td><td>所有职位</td><td>1分</td><td>1分</td><td>0分</td></tr>
+      <tr><td>行政双床房</td><td>所有职位</td><td>2分</td><td>2分</td><td>0分</td></tr>
+      <tr><td>休闲房</td><td>所有职位</td><td>1.5分</td><td>1.5分</td><td>0分</td></tr>
+      <tr><td>颐馨大床房</td><td>所有职位</td><td>1分</td><td>1分</td><td>0分</td></tr>
+      <tr><td>欧馨大床房</td><td>所有职位</td><td>1分</td><td>1分</td><td>0分</td></tr>
+    </table>
+  </li>
+  <li>分值是员工做工统计和计件结算的基础</li>
+  <li>退房清洁分值通常≥住房清洁（退房清洁工作量更大）</li>
+  <li>空房清洁一般0分（简单通风检查）</li>
+</ul>
+
+<h4>6.3.6 客人相关（经理视角）</h4>
+<ul>
+  <li>退房检查、客房自查、赶房清洁、对客服务、投诉预警——与前台住客服务管家数据一致，但经理视角更侧重全局监控和异常处理</li>
+  <li>经理可查看所有部门工单，前台只看本部门/自己创建的</li>
+</ul>
+
+<h3>6.4 客房经理日常工作流</h3>
+<div class="flow-step"><strong>班前（08:00前）</strong> —— 查看员工班表确认当日出勤和楼层分配，检查PMS同步房态，在"每日分配"中拖拽分配清洁任务，均衡每人分值负载</div>
+<div class="flow-step"><strong>班中（08:00-16:30）</strong> —— 房态图实时监控清洁进度，处理超时工单和加急赶房，审批投诉和工程报修，监控布草消耗，协调人员（忙/空闲状态）</div>
+<div class="flow-step"><strong>班后（16:30后）</strong> —— 查看清洁人报表确认当日完成情况，导出日报表/月报表，分析员工做工量和通过率，安排次日排班，处理未完成任务交接</div>
+<div class="flow-step"><strong>周期性</strong> —— 维护房型分值和布草配置，分析布草消耗趋势优化采购，根据出租率调整人员配置，处理计件工资结算</div>
+</section>
+
+<!-- ==================== 7. 核心业务流程 ==================== -->
+<section id="s7">
+<h2>七、核心业务流程</h2>
+
+<h3>7.1 客房清洁全流程</h3>
+<div class="flow-step"><strong>① 房态同步</strong> —— 蓝豆云实时对接绿云PMS，客人退房后房态变为VD（脏空），系统自动生成清洁任务</div>
+<div class="flow-step"><strong>② 任务分配</strong> —— 客房经理/主管在PC端"每日分配"中，按楼层和人员负载将任务拖拽分配给服务员，或系统按值班地点自动分配</div>
+<div class="flow-step"><strong>③ 任务接收</strong> —— 服务员APP端"客房清洁"列表显示分配的任务，按赶房→客人要求→普通清洁优先级排序，显示进度条</div>
+<div class="flow-step"><strong>④ 开始清洁</strong> —— 服务员点击房间进入详情，查看客人信息和注意事项（在住房提示敲门），点击"开始清洁"，系统开始计时</div>
+<div class="flow-step"><strong>⑤ 清洁中操作</strong> —— 更新布草/易耗品（系统自动预估，手动调整）、登记查房遗留/异常/消费、创建工程维修工单、执行周期卫生任务，可"暂停清洁"</div>
+<div class="flow-step"><strong>⑥ 完成清洁</strong> —— 点击"完成清洁"，记录完成时间和总耗时，房间状态变为"待检查"，通知领班/主管</div>
+<div class="flow-step"><strong>⑦ 清洁检查</strong> —— 领班/主管在APP"清洁检查"中查看待检房间，单房检查或批量检查，通过→房间变为OC（净住）/VC（净空）；不通过→更换清洁人打回重做</div>
+<div class="flow-step"><strong>⑧ 数据归档</strong> —— 清洁记录（房量、分值、耗时、清洁人、检查人、检查结果）自动归档，汇入做工统计和进度报表</div>
+
+<h3>7.2 对客服务工单流程</h3>
+<div class="flow-step"><strong>① 需求发起</strong> —— 渠道：前台代客下单（PC）、客人携程小程序自助下单、客人电话、服务员APP创建</div>
+<div class="flow-step"><strong>② 工单创建</strong> —— 选择服务类型（物品/服务/打扫/换房/报修/遗留查找/催服务），输入房号和内容，系统自动匹配空闲处理人（显示姓名+职位+空闲/忙状态），可手动调整</div>
+<div class="flow-step"><strong>③ 自动派单</strong> —— 提交后系统即时推送至处理人APP，工单状态"待接收"，开始计时（超时标准：物品/服务/催服务6分钟，打扫/赶房40分钟，退房检查10分钟）</div>
+<div class="flow-step"><strong>④ 处理执行</strong> —— 处理人APP接收工单，状态变"处理中"，执行服务（送物/开门/打扫等），可添加备注和照片</div>
+<div class="flow-step"><strong>⑤ 完成确认</strong> —— 处理人标记完成，记录完成时间和耗时；如勾选"需要回复"，需回复客人；前台可"代完成"</div>
+<div class="flow-step"><strong>⑥ 超时升级</strong> —— 超时未完成时，系统按主管→经理→高层分级发送提醒；前台可"客人催服务"加急</div>
+<div class="flow-step"><strong>⑦ 客人档案</strong> —— 服务记录自动归入客人档案，统计常用服务/物品，形成偏好标签</div>
+
+<h3>7.3 赶房流程</h3>
+<div class="flow-step"><strong>① 发起赶房</strong> —— 前台在PC端"新建赶房单"，选择房号，指定/自动匹配清洁人和查房主管，填写清洁要求，输入客人手机号（可选，赶房完成发短信）</div>
+<div class="flow-step"><strong>② 加急通知</strong> —— 同时通知服务员和主管，APP端赶房任务最高优先级显示（"按下单时间最早"排序）</div>
+<div class="flow-step"><strong>③ 加急清洁</strong> —— 服务员优先处理赶房任务，40分钟超时标准</div>
+<div class="flow-step"><strong>④ 加急检查</strong> —— 清洁完成后主管优先检查，通过后房间立即变为可售净房</div>
+<div class="flow-step"><strong>⑤ 通知客人</strong> —— 赶房完成，系统自动给客人发短信（如已填手机号），前台可通知客人入住</div>
+<div class="flow-step"><strong>⑥ 记录归档</strong> —— 赶房记录（耗时、清洁人、查房主管）归档，赶房列表可追溯</div>
+
+<h3>7.4 工程维修流程</h3>
+<div class="flow-step"><strong>① 报修发起</strong> —— 服务员清洁中发现设施问题→APP清洁详情页"工程维修"创建；客人报修→前台/OTA创建；内部报修→员工APP创建</div>
+<div class="flow-step"><strong>② 工单信息</strong> —— 填写报修对象（如普通灯）、内容（如常亮）、报修备注（如书桌上方射灯不断电）、拍照，系统记录报修人/部门/时间</div>
+<div class="flow-step"><strong>③ 派工维修</strong> —— 工单状态"待派工"，流转工程部，指派维修人员</div>
+<div class="flow-step"><strong>④ 维修执行</strong> —— 维修人员处理，填写维修备注</div>
+<div class="flow-step"><strong>⑤ 验收闭环</strong> —— 报修人/主管"验收通过"确认修复；未修复可"重新维修"打回</div>
+<div class="flow-step"><strong>⑥ 房态联动</strong> —— 维修中的房间在房态图标记（工程报修数量统计），严重问题可设为OOO维修房</div>
+
+<h3>7.5 查房与遗留流程</h3>
+<div class="flow-step"><strong>① 退房检查发起</strong> —— 客人退房时，前台"快速下单"或系统自动生成退房检查任务，或服务员主动"客房自查"</div>
+<div class="flow-step"><strong>② 查房执行</strong> —— 服务员/查房员到房间检查，登记四类结果：消费（迷你吧/物品消费）、遗留（客人物品，分类选择）、客房状态（异常/损坏）、备注+照片</div>
+<div class="flow-step"><strong>③ 遗留物品处理</strong> —— 登记遗留物品分类（生活用品/数码产品/其他），保存待客人认领，"遗留查找"工单可查询</div>
+<div class="flow-step"><strong>④ 检查结果</strong> —— 通过（无异常）/ 异常（有消费/遗留/损坏），异常红色标记，通知前台处理（如索赔、联系客人）</div>
+<div class="flow-step"><strong>⑤ 借物核对</strong> —— 退房时核对"借物及归还记录"，未归还物品提醒前台联系客人归还或索赔</div>
+</section>
+
+<!-- ==================== 8. 数据统计与报表体系 ==================== -->
+<section id="s8">
+<h2>八、数据统计与报表体系</h2>
+
+<h3>8.1 报表总览</h3>
+<table>
+  <tr><th>报表名称</th><th>使用端</th><th>核心内容</th><th>用途</th></tr>
+  <tr><td>员工做工统计</td><td>APP+PC</td><td>每人分配间数、已清洁间/分、超额分、通过率</td><td>计件工资结算、员工绩效</td></tr>
+  <tr><td>清洁人报表</td><td>PC每日分配</td><td>按人展开房间明细，房量分值、状态、清洁/检查时间、布草</td><td>当日进度跟踪</td></tr>
+  <tr><td>进度报表（明细）</td><td>Excel导出</td><td>序号、姓名、职位、班次、楼栋、房间、客人VIP、类型、房型、状态、房量、完成房量</td><td>详细审计、计件核算</td></tr>
+  <tr><td>进度汇总报表</td><td>Excel导出</td><td>员工×楼层矩阵 + 完成清洁量/分值/班次基数/超额</td><td>全局负载分析、跨楼层统计</td></tr>
+  <tr><td>对客服务统计</td><td>PC报表</td><td>日报表、按小时柱状图、服务类型筛选</td><td>服务时效分析、人力配置</td></tr>
+  <tr><td>日报表/月报表</td><td>PC导出</td><td>每日/每月房务运营汇总</td><td>管理层汇报、趋势分析</td></tr>
+  <tr><td>个人清洁量统计</td><td>PC</td><td>个人维度清洁量趋势</td><td>员工绩效跟踪</td></tr>
+  <tr><td>布草酒水统计</td><td>APP+PC</td><td>按地点/员工/物品三维度消耗明细</td><td>成本核算、采购决策</td></tr>
+  <tr><td>工单导出</td><td>PC</td><td>对客服务工单全量明细Excel</td><td>服务审计、投诉分析</td></tr>
+</table>
+
+<h3>8.2 员工做工统计详解</h3>
+<p><strong>APP端视图（按员工横向排列）：</strong></p>
+<table>
+  <tr><th>员工</th><th>分配</th><th>已清洁</th><th>超额</th><th>通过率</th></tr>
+  <tr><td>外协4</td><td>17间</td><td>14.5分/14间</td><td>14.5分</td><td>100%</td></tr>
+  <tr><td>黄玉娥</td><td>13间</td><td>13分/10间</td><td>13分</td><td>100%</td></tr>
+  <tr><td>外协2</td><td>17间</td><td>13分/13间</td><td>13分</td><td>100%</td></tr>
+  <tr><td>外协1</td><td>18间</td><td>12分/12间</td><td>12分</td><td>100%</td></tr>
+  <tr><td>王先菊</td><td>18间</td><td>11分/11间</td><td>0分</td><td>100%</td></tr>
+  <tr><td>外协3</td><td>18间</td><td>10分/10间</td><td>10分</td><td>100%</td></tr>
+  <tr><td>黄小林</td><td>19间</td><td>10分/9间</td><td>0分</td><td>0%</td></tr>
+  <tr><td>苏秀花</td><td>16间</td><td>9.5分/9间</td><td>9.5分</td><td>100%</td></tr>
+  <tr><td>张四妹</td><td>15间</td><td>9.5分/9间</td><td>9.5分</td><td>100%</td></tr>
+  <tr><td>黄巧兰</td><td>19间</td><td>9.5分/9间</td><td>0分</td><td>0%</td></tr>
+</table>
+<div class="note">超额分 = 实际完成分值 - 班次基数分（如早班基数12分），超过部分为超额计件。通过率 = 检查通过数 / 检查总数，反映清洁质量。</div>
+
+<h3>8.3 进度汇总报表示例</h3>
+<p>员工×楼层矩阵（数值=该员工在该楼层完成的房量）：</p>
+<table>
+  <tr><th>姓名</th><th>职位</th><th>13F</th><th>14F</th><th>15F</th><th>16F</th><th>17F</th><th>18F</th><th>19F</th><th>20F</th><th>21F</th><th>22F</th><th>23F</th><th>24F</th><th>完成量</th><th>完成分值</th><th>班次基数</th><th>超额</th></tr>
+  <tr><td>黄巧兰</td><td>楼层服务员</td><td></td><td></td><td>5</td><td></td><td></td><td></td><td></td><td>5</td><td></td><td></td><td></td><td>4</td><td>9</td><td>9.5</td><td>早班12分</td><td>0</td></tr>
+  <tr><td>黄小林</td><td>高级服务员</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>10</td><td>11</td><td>早班12分</td><td>0</td></tr>
+  <tr><td>黄玉娥</td><td>楼层服务员</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>10</td><td>10</td><td>13</td><td>早班加班0分</td><td>13</td></tr>
+  <tr><td>外协4</td><td>楼层服务员</td><td>9</td><td>5</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td>14</td><td>14.5</td><td>早班加班0分</td><td>14.5</td></tr>
+</table>
+
+<h3>8.4 对客服务统计</h3>
+<ul>
+  <li><strong>日报表：</strong>选择日期（如2026/8/10）</li>
+  <li><strong>统计维度：</strong>按小时统计（柱状图展示0-23点服务量分布）、全部服务/分类型筛选</li>
+  <li><strong>分析价值：</strong>识别服务高峰时段（如8-9点、22-23点），优化人员排班；分析服务类型分布，优化物品库存</li>
+</ul>
+
+<h3>8.5 布草酒水统计</h3>
+<ul>
+  <li><strong>三维度：</strong>按地点（楼层）、按员工、按物品</li>
+  <li><strong>时间筛选：</strong>今天/自定义</li>
+  <li><strong>分析价值：</strong>楼层间消耗对比（发现异常消耗）、员工间消耗对比（发现浪费/遗漏）、物品消耗趋势（采购计划）、与出租率对比（单房消耗成本）</li>
+</ul>
+</section>
+
+<!-- ==================== 9. 系统配置与基础数据 ==================== -->
+<section id="s9">
+<h2>九、系统配置与基础数据</h2>
+
+<h3>9.1 基础数据配置清单</h3>
+<table>
+  <tr><th style="width:25%">配置项</th><th>配置内容</th><th>影响范围</th></tr>
+  <tr><td>房型管理</td><td>房型名称、新建/编辑房型</td><td>全系统房态、任务、统计</td></tr>
+  <tr><td>清洁分值</td><td>按房型×清洁类型（退房/住房/空房）配置分值，按清洁人职位</td><td>做工统计、计件结算、任务分配负载</td></tr>
+  <tr><td>布草配置</td><td>按房型配置每种布草标准数量（住/退）</td><td>APP自动预估布草、消耗统计</td></tr>
+  <tr><td>易耗品配置</td><td>按房型配置易耗品标准数量</td><td>APP易耗品更新、消耗统计</td></tr>
+  <tr><td>服务标准-超时</td><td>各服务类型超时时间（打扫40分/催服务6分/换房6分/赶房40分/退房检查10分/物品6分/服务6分）</td><td>超时预警、分级提醒</td></tr>
+  <tr><td>服务标准-分级</td><td>超时后按主管→经理→高层逐级升级提醒</td><td>消息通知路由</td></tr>
+  <tr><td>服务标准-抄送</td><td>工单抄送规则配置</td><td>消息通知</td></tr>
+  <tr><td>班次时间</td><td>早班/中班/晚班时间段定义</td><td>排班、工时统计</td></tr>
+  <tr><td>特例分类</td><td>特殊排班规则分类</td><td>服务排班</td></tr>
+  <tr><td>员工信息</td><td>姓名、角色（经理/主管/高级服务员/楼层服务员/外协）、部门</td><td>全系统人员管理</td></tr>
+  <tr><td>楼栋/楼层/房号</td><td>酒店物理结构配置（楼栋、楼层、房号、房型对应）</td><td>房态图、任务分配</td></tr>
+  <tr><td>PMS对接</td><td>绿云PMS接口配置，房态同步规则</td><td>房态数据来源</td></tr>
+  <tr><td>OTA对接</td><td>携程小程序接口配置，消息打通</td><td>客人自助下单渠道</td></tr>
+</table>
+
+<h3>9.2 房型与分值体系</h3>
+<p>分值是蓝豆云计件管理的核心，每间房根据房型和清洁类型赋予不同分值：</p>
+<ul>
+  <li><strong>基础房型（1分）：</strong>超级大床房、亲子双床房、商务双床房、享浴大床房、行政大床房、颐馨大床房、欧馨大床房 —— 退房1分/住房1分/空房0分</li>
+  <li><strong>大房型（2分）：</strong>复式套房、行政双床房 —— 退房2分/住房2分/空房0分（面积大/双床，清洁工作量大）</li>
+  <li><strong>中等房型（1.5分）：</strong>休闲房 —— 退房1.5分/住房1.5分/空房0分</li>
+</ul>
+<div class="note">班次基数（如早班12分）= 员工每班应完成的基础分值，实际完成超过基数的部分为"超额分"，用于计件工资核算。住房清洁分值通常等于或略低于退房清洁（退房需更换全套布草、深度清洁，在住房只需整理）。</div>
+
+<h3>9.3 布草标准配置</h3>
+<p>按房型配置标准布草数量（住/退通用），示例：</p>
+<table>
+  <tr><th>布草项</th><th>超级大床房</th><th>复式套房</th><th>商务双床房</th><th>颐馨大床房</th><th>行政双床房</th></tr>
+  <tr><td>床单</td><td>2.6米×1</td><td>1.8米×1</td><td>1.3米×2</td><td>1.8米×1</td><td>1.3米×2</td></tr>
+  <tr><td>被套</td><td>2.6米×1</td><td>1.8米×1</td><td>1.3米×2</td><td>1.8米×1</td><td>1.3米×2</td></tr>
+  <tr><td>枕套</td><td>4</td><td>4</td><td>4</td><td>4</td><td>4</td></tr>
+  <tr><td>浴巾</td><td>2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+  <tr><td>面巾</td><td>2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+  <tr><td>方巾</td><td>2</td><td>2</td><td>2</td><td>2</td><td>2</td></tr>
+  <tr><td>地巾</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+  <tr><td>浴袍</td><td>-</td><td>2</td><td>-</td><td>-</td><td>2</td></tr>
+</table>
+</section>
+
+<!-- ==================== 10. 角色权限与端功能矩阵 ==================== -->
+<section id="s10">
+<h2>十、角色权限与端功能矩阵</h2>
+
+<h3>10.1 四角色功能权限矩阵</h3>
+<table>
+  <tr><th style="width:22%">功能模块</th><th>服务员（APP）</th><th>领班/主管（APP+PC）</th><th>前台（PC-住客服务管家）</th><th>客房经理（PC-客房管家）</th></tr>
+  <tr><td>客房清洁执行</td><td>✅ 核心</td><td>✅ 可执行</td><td>❌</td><td>❌</td></tr>
+  <tr><td>清洁检查（通过/不通过）</td><td>❌</td><td>✅ 核心</td><td>❌</td><td>✅ 可抽查</td></tr>
+  <tr><td>批量检查</td><td>❌</td><td>✅</td><td>❌</td><td>✅</td></tr>
+  <tr><td>任务分配（每日分配）</td><td>❌</td><td>✅ APP端</td><td>❌</td><td>✅ 核心PC端</td></tr>
+  <tr><td>房态图查看</td><td>✅ 有限</td><td>✅ 完整</td><td>✅ 完整</td><td>✅ 完整</td></tr>
+  <tr><td>新建工单（服务/报修）</td><td>✅</td><td>✅</td><td>✅ 核心</td><td>✅</td></tr>
+  <tr><td>我的工单（处理）</td><td>✅ 核心</td><td>✅</td><td>✅ 跟踪</td><td>✅ 监控</td></tr>
+  <tr><td>全部工单（全局查看）</td><td>❌</td><td>✅ 本部门</td><td>✅ 本部门/自己</td><td>✅ 全部</td></tr>
+  <tr><td>工单导出</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td></tr>
+  <tr><td>代完成/取消/挂起</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr>
+  <tr><td>赶房创建/管理</td><td>❌</td><td>✅</td><td>✅ 核心</td><td>✅ 监控</td></tr>
+  <tr><td>退房检查</td><td>✅ 执行</td><td>✅ 审核</td><td>✅ 发起/跟踪</td><td>✅ 监控</td></tr>
+  <tr><td>客房自查</td><td>✅ 执行</td><td>✅ 审核</td><td>✅ 查看</td><td>✅ 监控</td></tr>
+  <tr><td>遗留物品登记</td><td>✅</td><td>✅</td><td>✅ 发起查找</td><td>✅</td></tr>
+  <tr><td>借物归还</td><td>✅ 本楼层</td><td>✅ 全局</td><td>✅</td><td>✅</td></tr>
+  <tr><td>布草更新（清洁中）</td><td>✅ 核心</td><td>✅</td><td>❌</td><td>❌</td></tr>
+  <tr><td>布草配置（标准设置）</td><td>❌</td><td>❌</td><td>❌</td><td>✅ 核心</td></tr>
+  <tr><td>布草酒水统计</td><td>✅ 个人</td><td>✅ 全局</td><td>❌</td><td>✅ 核心</td></tr>
+  <tr><td>工程维修（创建/验收）</td><td>✅ 创建</td><td>✅ 验收</td><td>✅ 客人报修</td><td>✅ 监控</td></tr>
+  <tr><td>员工班表（排班）</td><td>❌</td><td>✅ 查看</td><td>✅ 服务排班</td><td>✅ 核心</td></tr>
+  <tr><td>人员状态（空闲/忙）</td><td>❌</td><td>✅ 分配用</td><td>✅ 派单用</td><td>✅</td></tr>
+  <tr><td>做工统计（个人）</td><td>✅ 自己</td><td>✅ 全员</td><td>❌</td><td>✅ 核心</td></tr>
+  <tr><td>进度报表/汇总报表</td><td>❌</td><td>✅ 查看</td><td>❌</td><td>✅ 核心导出</td></tr>
+  <tr><td>对客服务统计</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td></tr>
+  <tr><td>投诉预警</td><td>❌</td><td>✅ 处理</td><td>✅ 发起/跟踪</td><td>✅ 核心处理</td></tr>
+  <tr><td>客人档案</td><td>❌</td><td>❌</td><td>✅ 核心</td><td>✅ 查看</td></tr>
+  <tr><td>服务标准配置</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td></tr>
+  <tr><td>房型/分值配置</td><td>❌</td><td>❌</td><td>❌</td><td>✅ 核心</td></tr>
+  <tr><td>系统设置</td><td>❌</td><td>❌</td><td>❌</td><td>✅ 核心</td></tr>
+  <tr><td>夜床服务</td><td>✅ 执行</td><td>✅ 管理</td><td>✅ 发起</td><td>✅ 配置</td></tr>
+  <tr><td>周期卫生任务</td><td>✅ 执行</td><td>✅ 管理</td><td>❌</td><td>✅ 配置</td></tr>
+  <tr><td>培训工单</td><td>✅ 接收</td><td>✅ 创建</td><td>❌</td><td>✅</td></tr>
+  <tr><td>群发通知</td><td>✅ 接收</td><td>✅ 发送</td><td>❌</td><td>✅</td></tr>
+  <tr><td>打赏记录</td><td>✅ 查看</td><td>✅ 查看</td><td>❌</td><td>✅</td></tr>
+</table>
+
+<h3>10.2 三端产品定位对比</h3>
+<div class="grid-2">
+  <div class="module-card">
+    <h4>📱 手机端APP</h4>
+    <p><strong>使用者：</strong>服务员、领班/主管</p>
+    <p><strong>核心价值：</strong>移动执行、即时响应、数据采集</p>
+    <p><strong>使用场景：</strong>客房内清洁、走廊巡检、客人服务现场</p>
+    <p><strong>设计原则：</strong>大按钮、少输入、默认值、单手操作</p>
+  </div>
+  <div class="module-card">
+    <h4>💻 住客服务管家（PC）</h4>
+    <p><strong>使用者：</strong>前台接待、前厅主管</p>
+    <p><strong>核心价值：</strong>服务调度、客人体验、响应时效</p>
+    <p><strong>使用场景：</strong>前台工位，面对客人服务需求</p>
+    <p><strong>设计原则：</strong>快速创建、实时跟踪、客人档案联动</p>
+  </div>
+  <div class="module-card">
+    <h4>💻 客房管家（PC）</h4>
+    <p><strong>使用者：</strong>客房经理、客房主管</p>
+    <p><strong>核心价值：</strong>全局管理、资源配置、数据分析</p>
+    <p><strong>使用场景：</strong>客房办公室，日常运营管理</p>
+    <p><strong>设计原则：</strong>一屏全局、拖拽分配、报表导出</p>
+  </div>
+  <div class="module-card">
+    <h4>🔗 外部系统对接</h4>
+    <p><strong>绿云PMS：</strong>房态数据实时同步（VD/OC/VC/OD等），客人信息、入住/退房</p>
+    <p><strong>携程小程序：</strong>客人自助下单（送物/催服务），消息打通，客人偏好</p>
+    <p><strong>短信网关：</strong>赶房完成自动短信通知客人</p>
+  </div>
+</div>
+
+<h3>10.3 系统核心亮点总结</h3>
+<ol>
+  <li><strong>房务全链路数字化：</strong>从PMS房态→自动生成任务→手机端执行→检查→数据统计，全程无纸质化，每间房清洁计时留痕</li>
+  <li><strong>计件工资自动化：</strong>按房型配置分值，系统自动统计每人完成间数/分值/超额/通过率，直接用于计件结算，减少人工核算</li>
+  <li><strong>对客服务多渠道一体化：</strong>前台、客人电话、携程小程序自助、服务员转达，所有需求统一工单池，自动派单给空闲人员，超时分级预警</li>
+  <li><strong>布草精细化管理：</strong>按房型配置标准→清洁时自动预估→实际消耗登记→多维度统计分析，有效控制布草成本和流失</li>
+  <li><strong>客人偏好数据资产：</strong>每次服务自动归档，形成客人偏好标签，前台创建工单时主动展示，支撑个性化服务和会员运营</li>
+  <li><strong>赶房极速响应：</strong>同时通知清洁人和主管，APP端最高优先级，完成后自动短信通知客人，提升OTA好评率</li>
+  <li><strong>三端协同角色清晰：</strong>服务员执行、前台服务、经理管理，各端功能聚焦，数据实时同步，避免信息孤岛</li>
+</ol>
+
+</section>
+
+<footer>
+  <p>蓝豆云 LANDOW 酒店房务管理系统 · 产品体系设计文档</p>
+  <p>基于59张系统界面截图全量逆向分析 ｜ 覆盖手机端APP / PC端客房管家 / PC端住客服务管家</p>
+</footer>
+
+</div>
+</body>
+</html>
